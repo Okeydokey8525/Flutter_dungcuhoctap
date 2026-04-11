@@ -120,6 +120,7 @@ class DatabaseHelper {
     );
 
     if (existing.isNotEmpty) {
+      // ignore: avoid_print
       print("Email đã tồn tại!");
       return null;
     }
