@@ -1,3 +1,26 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+# Flutter_dungcuhoctap
+Làm web Flutter bán dụng cụ học tập 
+=======
+# app_dung_cu_hoc_tap
+
+A new Flutter project.
+
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
+>>>>>>> b898b35 (Khung cho do an)
+=======
 
 # 🖊️ Đồ Án Lập Trình Di Động: App Văn Phòng Phẩm (Deli & Thiên Long)
 
@@ -61,3 +84,4 @@ Nhóm thực hiện dự án bao gồm 4 thành viên với các vai trò đư�
 * **Giảng viên hướng dẫn:** [Điền tên Giảng viên vào đây]
 * **Năm học:** 2025 - 2026
 ```
+>>>>>>> 982e6e2e0f91a8f6e2b6fd13448935b1bfb1fe4a
