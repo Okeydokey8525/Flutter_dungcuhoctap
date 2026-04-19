@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import '../home/main_layout.dart';
 
 class SignupScreen extends StatefulWidget {
   final VoidCallback onLoginTap;
@@ -69,9 +70,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+    return MainLayout(
+      title: 'Đăng ký',
+      showBackButton: false,
+      child: Container(
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Form(

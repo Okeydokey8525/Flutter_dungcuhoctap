@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../home/main_layout.dart';
 
-class ProductManagementScreen extends StatelessWidget {
-  const ProductManagementScreen({super.key});
+class OrderManagementScreen extends StatelessWidget {
+  const OrderManagementScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +10,7 @@ class ProductManagementScreen extends StatelessWidget {
     const appBgColor = Color(0xFFF5F9FF);
 
     return MainLayout(
-      title: 'Quản lý sản phẩm',
+      title: 'Quản lý đơn hàng',
       showBackButton: true,
       child: Container(
         color: appBgColor,
@@ -62,11 +62,11 @@ class ProductManagementScreen extends StatelessWidget {
                       _buildSidebarItem(
                         Icons.inventory_2_outlined,
                         'Quản lý sản phẩm',
-                        isSelected: true,
                       ),
                       _buildSidebarItem(
                         Icons.shopping_bag_outlined,
                         'Quản lý đơn hàng',
+                        isSelected: true,
                       ),
                       _buildSidebarItem(Icons.people_outline, 'Khách hàng'),
                       _buildSidebarItem(
@@ -108,7 +108,7 @@ class ProductManagementScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Quản lý sản phẩm',
+                            'Quản lý đơn hàng',
                             style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
@@ -116,31 +116,27 @@ class ProductManagementScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Danh sách tất cả sản phẩm trong kho',
+                            'Theo dõi và cập nhật trạng thái đơn hàng',
                             style: TextStyle(color: Color(0xFF64748B)),
                           ),
                         ],
                       ),
-                      ElevatedButton.icon(
+                      IconButton(
                         onPressed: () {},
-                        icon: const Icon(Icons.add),
-                        label: const Text('Thêm sản phẩm mới'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
+                        icon: const Icon(Icons.download_outlined),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          padding: const EdgeInsets.all(12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: Color(0xFFE2E8F0)),
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 32),
-                  // Filters & Search
+                  // Filters
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -153,7 +149,7 @@ class ProductManagementScreen extends StatelessWidget {
                         Expanded(
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: 'Tìm kiếm sản phẩm theo tên, mã...',
+                              hintText: 'Tìm theo mã đơn, khách hàng...',
                               prefixIcon: const Icon(
                                 Icons.search,
                                 color: Color(0xFF94A3B8),
@@ -168,14 +164,18 @@ class ProductManagementScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        _buildDropdown('Tất cả danh mục'),
-                        const SizedBox(width: 16),
-                        _buildDropdown('Trạng thái: Tất cả'),
+                        _buildFilterButton('Tất cả', isSelected: true),
+                        const SizedBox(width: 8),
+                        _buildFilterButton('Chờ xác nhận'),
+                        const SizedBox(width: 8),
+                        _buildFilterButton('Đang giao'),
+                        const SizedBox(width: 8),
+                        _buildFilterButton('Đã hoàn thành'),
                       ],
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // Product Table
+                  // Order Table
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -187,12 +187,13 @@ class ProductManagementScreen extends StatelessWidget {
                       children: [
                         Table(
                           columnWidths: const {
-                            0: FlexColumnWidth(3),
-                            1: FlexColumnWidth(1.5),
-                            2: FlexColumnWidth(1.5),
-                            3: FlexColumnWidth(1),
-                            4: FlexColumnWidth(1.5),
-                            5: FlexColumnWidth(1),
+                            0: FlexColumnWidth(1.2),
+                            1: FlexColumnWidth(2),
+                            2: FlexColumnWidth(1.2),
+                            3: FlexColumnWidth(1.2),
+                            4: FlexColumnWidth(1),
+                            5: FlexColumnWidth(1.2),
+                            6: FlexColumnWidth(0.8),
                           },
                           children: [
                             const TableRow(
@@ -203,7 +204,7 @@ class ProductManagementScreen extends StatelessWidget {
                                     horizontal: 16,
                                   ),
                                   child: Text(
-                                    'SẢN PHẨM',
+                                    'MÃ ĐƠN',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -217,7 +218,7 @@ class ProductManagementScreen extends StatelessWidget {
                                     horizontal: 16,
                                   ),
                                   child: Text(
-                                    'DANH MỤC',
+                                    'KHÁCH HÀNG',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -231,7 +232,7 @@ class ProductManagementScreen extends StatelessWidget {
                                     horizontal: 16,
                                   ),
                                   child: Text(
-                                    'GIÁ BÁN',
+                                    'NGÀY ĐẶT',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -245,7 +246,21 @@ class ProductManagementScreen extends StatelessWidget {
                                     horizontal: 16,
                                   ),
                                   child: Text(
-                                    'TỒN KHO',
+                                    'TỔNG TIỀN',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF94A3B8),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 16,
+                                  ),
+                                  child: Text(
+                                    'THANH TOÁN',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -284,35 +299,35 @@ class ProductManagementScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            _buildProductRow(
-                              'Bút Bi HUIT Blue',
-                              'TL-001',
-                              'Bút viết',
-                              '25.000đ',
-                              '1,240',
-                              'Còn hàng',
+                            _buildOrderRow(
+                              '#HUIT-88291',
+                              'Nguyễn Văn A',
+                              '0901 234 567',
+                              '08/04/2024',
+                              '200.000đ',
+                              'COD',
+                              'Đang xử lý',
+                              Colors.blue,
+                            ),
+                            _buildOrderRow(
+                              '#HUIT-88290',
+                              'Trần Thị B',
+                              '0988 777 666',
+                              '07/04/2024',
+                              '450.000đ',
+                              'Momo',
+                              'Đang giao',
+                              Colors.purple,
+                            ),
+                            _buildOrderRow(
+                              '#HUIT-88289',
+                              'Lê Văn C',
+                              '0912 345 678',
+                              '07/04/2024',
+                              '120.000đ',
+                              'COD',
+                              'Đã giao',
                               Colors.green,
-                              'https://picsum.photos/seed/pen/100/100',
-                            ),
-                            _buildProductRow(
-                              'Sổ Tay Lò Xo A5',
-                              'ST-042',
-                              'Sổ tay',
-                              '45.000đ',
-                              '8',
-                              'Sắp hết',
-                              Colors.orange,
-                              'https://picsum.photos/seed/notebook/100/100',
-                            ),
-                            _buildProductRow(
-                              'Kéo Thủ Công',
-                              'DC-015',
-                              'Dụng cụ cắt',
-                              '15.000đ',
-                              '0',
-                              'Hết hàng',
-                              Colors.red,
-                              'https://picsum.photos/seed/scissors/100/100',
                             ),
                           ],
                         ),
@@ -322,7 +337,7 @@ class ProductManagementScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              'Hiển thị 1-10 trên 156 sản phẩm',
+                              'Hiển thị 1-10 trên 84 đơn hàng',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF64748B),
@@ -338,8 +353,6 @@ class ProductManagementScreen extends StatelessWidget {
                                 _buildPageNumber(1, isSelected: true),
                                 const SizedBox(width: 8),
                                 _buildPageNumber(2),
-                                const SizedBox(width: 8),
-                                _buildPageNumber(3),
                                 const SizedBox(width: 8),
                                 _buildPageButton(Icons.chevron_right),
                               ],
@@ -408,94 +421,77 @@ class ProductManagementScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdown(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+  Widget _buildFilterButton(String text, {bool isSelected = false}) {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? const Color(0xFF0B3C8C) : Colors.white,
+        foregroundColor: isSelected ? Colors.white : const Color(0xFF64748B),
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: isSelected
+              ? BorderSide.none
+              : const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
       ),
-      child: Row(
-        children: [
-          Text(
-            text,
-            style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
-          ),
-          const SizedBox(width: 8),
-          const Icon(
-            Icons.keyboard_arrow_down,
-            size: 20,
-            color: Color(0xFF64748B),
-          ),
-        ],
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  TableRow _buildProductRow(
+  TableRow _buildOrderRow(
+    String id,
     String name,
-    String sku,
-    String category,
-    String price,
-    String stock,
+    String phone,
+    String date,
+    String total,
+    String payment,
     String status,
     Color statusColor,
-    String imageUrl,
   ) {
     return TableRow(
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Row(
+          child: Text(
+            id,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0B3C8C),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                  ),
+              Text(
+                name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0F172A),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
-                      ),
-                    ),
-                    Text(
-                      'SKU: $sku',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF94A3B8),
-                      ),
-                    ),
-                  ],
-                ),
+              Text(
+                phone,
+                style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
               ),
             ],
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Text(
-            category,
-            style: const TextStyle(color: Color(0xFF475569)),
-          ),
+          child: Text(date, style: const TextStyle(color: Color(0xFF64748B))),
         ),
         Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            price,
+            total,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Color(0xFF0F172A),
@@ -504,7 +500,10 @@ class ProductManagementScreen extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Text(stock, style: const TextStyle(color: Color(0xFF475569))),
+          child: Text(
+            payment,
+            style: const TextStyle(color: Color(0xFF475569)),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.all(16),
@@ -530,21 +529,15 @@ class ProductManagementScreen extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.edit_outlined, color: Color(0xFF94A3B8)),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.visibility_outlined,
+                color: Color(0xFF94A3B8),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.delete_outline,
-                  color: Color(0xFF94A3B8),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ],

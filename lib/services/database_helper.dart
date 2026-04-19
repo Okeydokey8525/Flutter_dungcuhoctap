@@ -28,7 +28,7 @@ class DatabaseHelper {
     );
   }
 
-  // ================= CREATE TABLE =================
+  // ================= CREATE TABLE & SEED DATA =================
   Future _createDB(Database db, int version) async {
     // Categories
     await db.execute('''
@@ -73,6 +73,20 @@ class DatabaseHelper {
     )
     ''');
 
+    // Cart
+    await db.execute('''
+    CREATE TABLE cart (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      product_id INTEGER,
+      quantity INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (product_id) REFERENCES products(id),
+      UNIQUE(user_id, product_id)
+    )
+    ''');
+
     // Orders
     await db.execute('''
     CREATE TABLE orders (
@@ -106,13 +120,19 @@ class DatabaseHelper {
       'CREATE INDEX idx_product_category ON products(category_id)',
     );
     await db.execute('CREATE INDEX idx_order_user ON orders(user_id)');
+
+    // --- SEED DATA (Tạo tài khoản Admin mặc định) ---
+    await db.insert('users', {
+      'username': 'admin',
+      'password': '123',
+      'email': 'admin@gmail.com',
+      'role': 'admin',
+    });
   }
 
   // ================= USER =================
   Future<int?> registerUser(Map<String, dynamic> user) async {
     final db = await instance.database;
-
-    // check email tồn tại chưa
     final existing = await db.query(
       'users',
       where: 'email = ?',
@@ -120,11 +140,8 @@ class DatabaseHelper {
     );
 
     if (existing.isNotEmpty) {
-      // ignore: avoid_print
-      print("Email đã tồn tại!");
       return null;
     }
-
     return await db.insert('users', user);
   }
 
@@ -133,15 +150,23 @@ class DatabaseHelper {
     String password,
   ) async {
     final db = await instance.database;
-
     final result = await db.query(
       'users',
       where: 'username = ? AND password = ?',
       whereArgs: [username, password],
     );
+    return result.isNotEmpty ? result.first : null;
+  }
 
-    if (result.isNotEmpty) return result.first;
-    return null;
+  // ================= CATEGORY =================
+  Future<int> insertCategory(Map<String, dynamic> category) async {
+    final db = await instance.database;
+    return await db.insert('categories', category);
+  }
+
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final db = await instance.database;
+    return await db.query('categories');
   }
 
   // ================= PRODUCT =================
@@ -152,7 +177,6 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getAllProducts() async {
     final db = await instance.database;
-
     return await db.rawQuery('''
       SELECT p.*, c.name as category_name
       FROM products p
@@ -162,27 +186,48 @@ class DatabaseHelper {
 
   Future<Map<String, dynamic>?> getProductById(int id) async {
     final db = await instance.database;
-
     final result = await db.query('products', where: 'id = ?', whereArgs: [id]);
-
     return result.isNotEmpty ? result.first : null;
   }
 
   Future<List<Map<String, dynamic>>> searchProducts(String keyword) async {
     final db = await instance.database;
-
     return await db.rawQuery(
-      '''
-      SELECT * FROM products
-      WHERE name LIKE ? OR brand LIKE ?
-    ''',
+      'SELECT * FROM products WHERE name LIKE ? OR brand LIKE ?',
       ['%$keyword%', '%$keyword%'],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> filterProducts({
+    String? grade,
+    int? categoryId,
+    double? minPrice,
+    double? maxPrice,
+  }) async {
+    final db = await instance.database;
+    return await db.query(
+      'products',
+      where: '''
+        (? IS NULL OR grade = ?)
+        AND (? IS NULL OR category_id = ?)
+        AND (? IS NULL OR price >= ?)
+        AND (? IS NULL OR price <= ?)
+      ''',
+      whereArgs: [
+        grade,
+        grade,
+        categoryId,
+        categoryId,
+        minPrice,
+        minPrice,
+        maxPrice,
+        maxPrice,
+      ],
     );
   }
 
   Future<int> updateProduct(int id, Map<String, dynamic> product) async {
     final db = await instance.database;
-
     return await db.update(
       'products',
       product,
@@ -193,24 +238,95 @@ class DatabaseHelper {
 
   Future<int> deleteProduct(int id) async {
     final db = await instance.database;
-
     return await db.delete('products', where: 'id = ?', whereArgs: [id]);
   }
 
-  // ================= ORDER =================
-  Future<int> createOrder(Map<String, dynamic> order) async {
+  // ================= CART =================
+  Future<int> addToCart(int userId, int productId, int quantity) async {
     final db = await instance.database;
-    return await db.insert('orders', order);
+    return await db.insert('cart', {
+      'user_id': userId,
+      'product_id': productId,
+      'quantity': quantity,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<int> addOrderItem(Map<String, dynamic> item) async {
+  Future<List<Map<String, dynamic>>> getCartItems(int userId) async {
     final db = await instance.database;
-    return await db.insert('order_items', item);
+    return await db.rawQuery(
+      '''
+      SELECT cart.*, products.name, products.price, products.image
+      FROM cart
+      JOIN products ON cart.product_id = products.id
+      WHERE cart.user_id = ?
+    ''',
+      [userId],
+    );
+  }
+
+  Future<int> updateCartQuantity(int cartId, int quantity) async {
+    final db = await instance.database;
+    return await db.update(
+      'cart',
+      {'quantity': quantity},
+      where: 'id = ?',
+      whereArgs: [cartId],
+    );
+  }
+
+  Future<int> removeCartItem(int cartId) async {
+    final db = await instance.database;
+    return await db.delete('cart', where: 'id = ?', whereArgs: [cartId]);
+  }
+
+  // ================= CHECKOUT & ORDER =================
+  Future<int> checkout({
+    required int userId,
+    required String paymentMethod,
+    required String shippingAddress,
+  }) async {
+    final db = await instance.database;
+
+    return await db.transaction((txn) async {
+      final cartItems = await txn.rawQuery(
+        '''
+        SELECT cart.*, products.price
+        FROM cart
+        JOIN products ON cart.product_id = products.id
+        WHERE cart.user_id = ?
+      ''',
+        [userId],
+      );
+
+      double total = 0;
+      for (var item in cartItems) {
+        total += (item['price'] as num) * (item['quantity'] as num);
+      }
+
+      final orderId = await txn.insert('orders', {
+        'user_id': userId,
+        'total': total,
+        'payment_method': paymentMethod,
+        'shipping_address': shippingAddress,
+        'status': 'pending',
+      });
+
+      for (var item in cartItems) {
+        await txn.insert('order_items', {
+          'order_id': orderId,
+          'product_id': item['product_id'],
+          'quantity': item['quantity'],
+          'price': item['price'],
+        });
+      }
+
+      await txn.delete('cart', where: 'user_id = ?', whereArgs: [userId]);
+      return orderId;
+    });
   }
 
   Future<List<Map<String, dynamic>>> getOrdersByUser(int userId) async {
     final db = await instance.database;
-
     return await db.query(
       'orders',
       where: 'user_id = ?',
@@ -221,7 +337,6 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getOrderDetails(int orderId) async {
     final db = await instance.database;
-
     return await db.rawQuery(
       '''
       SELECT oi.*, p.name, p.image
@@ -231,6 +346,41 @@ class DatabaseHelper {
     ''',
       [orderId],
     );
+  }
+
+  // ================= ADMIN & DASHBOARD =================
+  Future<List<Map<String, dynamic>>> getAllOrders() async {
+    final db = await instance.database;
+    return await db.query('orders', orderBy: 'created_at DESC');
+  }
+
+  Future<int> updateOrderStatus(int orderId, String status) async {
+    final db = await instance.database;
+    return await db.update(
+      'orders',
+      {'status': status},
+      where: 'id = ?',
+      whereArgs: [orderId],
+    );
+  }
+
+  Future<Map<String, dynamic>> getDashboardStats() async {
+    final db = await instance.database;
+    final productCount = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM products'),
+    );
+    final orderCount = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM orders'),
+    );
+    final revenueResult = await db.rawQuery(
+      'SELECT SUM(total) as revenue FROM orders',
+    );
+
+    return {
+      'products': productCount ?? 0,
+      'orders': orderCount ?? 0,
+      'revenue': revenueResult.first['revenue'] ?? 0,
+    };
   }
 
   // ================= COMMON =================

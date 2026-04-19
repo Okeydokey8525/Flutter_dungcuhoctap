@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../home/main_layout.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onSignupTap;
@@ -12,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
-}
+} //0336203775
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
@@ -63,9 +64,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+    return MainLayout(
+      title: 'Đăng nhập',
+      showBackButton: false,
+      child: Container(
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Form(
@@ -120,11 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Chức năng đang phát triển'),
-                        ),
-                      );
+                      Navigator.pushNamed(context, '/forgot_password');
                     },
                     child: const Text(
                       'Quên mật khẩu?',
