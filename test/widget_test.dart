@@ -1,30 +1,30 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:app_dung_cu_hoc_tap/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MainApp());
+  testWidgets('Main app shows login screen on startup', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Đăng nhập'), findsOneWidget);
+    expect(find.text('Đăng nhập ngay'), findsOneWidget);
+    expect(find.text('Tạo tài khoản mới'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('User can navigate from login to signup screen', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    final signupLink = find.text('Tạo tài khoản mới');
+    await tester.ensureVisible(signupLink);
+    await tester.tap(signupLink);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tạo tài khoản mới'), findsOneWidget);
+    expect(find.text('Đăng ký tài khoản'), findsOneWidget);
+    expect(find.text('Đã có tài khoản? '), findsOneWidget);
   });
 }
