@@ -7,6 +7,7 @@ class ContactScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF0B3C8C);
+    // ignore: unused_local_variable
     const appBgColor = Color(0xFFF5F9FF);
 
     return MainLayout(

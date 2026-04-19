@@ -591,6 +591,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   Widget _buildFooter(BuildContext context) {
     return Container(
       color: const Color(0xFF0F172A),
