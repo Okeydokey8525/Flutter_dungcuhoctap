@@ -64,7 +64,7 @@ class HomeScreen extends StatelessWidget {
             ),
             _buildDrawerItem(Icons.home, 'Trang chủ', true, () {}),
             _buildDrawerItem(Icons.inventory_2, 'Sản phẩm', false, () {
-              Navigator.pushNamed(context, '/home');
+              Navigator.pushNamed(context, '/product_list');
             }),
             _buildDrawerItem(Icons.shopping_cart, 'Giỏ hàng', false, () {
               Navigator.pushNamed(context, '/cart');

@@ -5,6 +5,8 @@ import 'package:app_dung_cu_hoc_tap/screens/home/home_screen.dart';
 import 'package:app_dung_cu_hoc_tap/screens/home/about_screen.dart';
 import 'package:app_dung_cu_hoc_tap/screens/home/lien_he.dart';
 import 'package:app_dung_cu_hoc_tap/screens/home/not_found_screen.dart';
+import 'package:app_dung_cu_hoc_tap/screens/home/product_detail_screen.dart';
+import 'package:app_dung_cu_hoc_tap/screens/home/product_list_screen.dart';
 import 'package:app_dung_cu_hoc_tap/screens/orders/order_history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:app_dung_cu_hoc_tap/screens/cart/cart_screen.dart';
@@ -37,8 +39,8 @@ class MyApp extends StatelessWidget {
       home: const HomeScreen(),
       routes: {
         '/home': (context) => const HomeScreen(),
-        '/product_list': (context) => const NotFoundScreen(),
-        '/product_detail': (context) => const NotFoundScreen(),
+        '/product_list': (context) => const ProductListScreen(),
+        '/product_detail': (context) => const ProductDetailScreen(),
         '/cart': (context) => const CartScreen(),
         '/checkout': (context) => const CheckoutScreen(),
         '/forgot_password': (context) => const ForgotPasswordScreen(),
