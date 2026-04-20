@@ -19,8 +19,11 @@ import 'package:app_dung_cu_hoc_tap/screens/admin/order_manage.dart';
 
 void main() {
   runApp(const MyApp());
+  runApp(const MyApp());
 }
 
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -29,6 +32,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'HUIT Stationery',
       theme: ThemeData(
+        primaryColor: const Color(0xFF0B3C8C),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B3C8C)),
         primaryColor: const Color(0xFF0B3C8C),
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B3C8C)),
         useMaterial3: true,
